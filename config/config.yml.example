@@ -1,0 +1,7 @@
+telegram:
+  token: token
+twitter:
+  consumerKey: key
+  consumerSecret: secret
+  accessToken: token
+  accessSecret: secret
