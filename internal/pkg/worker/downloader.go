@@ -43,6 +43,16 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 		for _, m := range tweet.ExtendedEntities.Media {
 			if m.Type == "photo" {
 				urls = append(urls, m.MediaURLHttps+":orig")
+			} else if m.Type == "video" {
+				maxBitrate := 0
+				url := ""
+				for _, v := range m.VideoInfo.Variants {
+					if v.Bitrate > maxBitrate {
+						maxBitrate = v.Bitrate
+						url = v.URL
+					}
+				}
+				urls = append(urls, url)
 			}
 		}
 	}
