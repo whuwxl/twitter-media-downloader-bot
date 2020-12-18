@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -25,9 +26,12 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 		return nil
 	}
 
-	s := update.ChannelPost.Text
-	ss := strings.Split(s, "/")
-	id, err := strconv.ParseInt(ss[len(ss)-1], 10, 64)
+	url, err := url.Parse(update.ChannelPost.Text)
+	if err != nil {
+		return err
+	}
+	s := strings.Split(url.Path, "/")
+	id, err := strconv.ParseInt(s[len(s)-1], 10, 64)
 	if err != nil {
 		return err
 	}
@@ -61,6 +65,8 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 		worker.Telegram.SendDocument(update.ChannelPost.Chat.ID, urls[0])
 	} else if len(urls) > 1 {
 		worker.Telegram.SendDocuments(update.ChannelPost.Chat.ID, urls)
+	} else {
+		return nil
 	}
 
 	worker.Telegram.DeleteMessage(update.ChannelPost.Chat.ID, update.ChannelPost.MessageID)
