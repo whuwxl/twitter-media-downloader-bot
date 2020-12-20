@@ -31,6 +31,17 @@ func (t *Telegram) DeleteMessage(chatID int64, messageID int) error {
 	return nil
 }
 
+// SendMessage ...
+func (t *Telegram) SendMessage(chatID int64, text string) error {
+	msg := tgbotapi.NewMessage(chatID, text)
+	_, err := t.Bot.Send(msg)
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
 // SendDocument ...
 func (t *Telegram) SendDocument(chatID int64, url string) error {
 	msg := tgbotapi.NewDocumentShare(chatID, url)
