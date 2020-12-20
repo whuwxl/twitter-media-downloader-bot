@@ -78,12 +78,12 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 
 	if len(urls) == 1 {
 		if err := worker.Telegram.SendDocument(chatID, urls[0]); err != nil {
-			worker.Telegram.SendMessage(chatID, err.Error()+"\n"+strings.Join(urls, "\n"))
+			worker.Telegram.SendMessage(chatID, err.Error()+"\n"+strings.Join(urls, "\n"), messageID)
 			return err
 		}
 	} else if len(urls) > 1 {
 		if err := worker.Telegram.SendDocuments(chatID, urls); err != nil {
-			worker.Telegram.SendMessage(chatID, err.Error()+"\n"+strings.Join(urls, "\n"))
+			worker.Telegram.SendMessage(chatID, err.Error()+"\n"+strings.Join(urls, "\n"), messageID)
 			return err
 		}
 	} else {

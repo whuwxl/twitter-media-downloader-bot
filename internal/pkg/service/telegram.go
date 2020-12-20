@@ -32,8 +32,9 @@ func (t *Telegram) DeleteMessage(chatID int64, messageID int) error {
 }
 
 // SendMessage ...
-func (t *Telegram) SendMessage(chatID int64, text string) error {
+func (t *Telegram) SendMessage(chatID int64, text string, messageID int) error {
 	msg := tgbotapi.NewMessage(chatID, text)
+	msg.ReplyToMessageID = messageID
 	_, err := t.Bot.Send(msg)
 	if err != nil {
 		return nil
