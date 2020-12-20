@@ -71,3 +71,33 @@ func (t *Telegram) SendDocuments(chatID int64, urls []string) error {
 
 	return nil
 }
+
+// SendPhoto ...
+func (t *Telegram) SendPhoto(chatID int64, url string) error {
+	msg := tgbotapi.NewPhotoShare(chatID, url)
+	_, err := t.Bot.Send(msg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// SendPhotos ...
+func (t *Telegram) SendPhotos(chatID int64, urls []string) error {
+	files := make([]interface{}, len(urls))
+	for i, v := range urls {
+		files[i] = tgbotapi.InputMediaPhoto{
+			Type:  "photo",
+			Media: v,
+		}
+	}
+
+	msg := tgbotapi.NewMediaGroup(chatID, files)
+	_, err := t.Bot.Send(msg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -63,12 +63,20 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 
 	if len(urls) == 1 {
 		if err := worker.Telegram.SendDocument(update.ChannelPost.Chat.ID, urls[0]); err != nil {
-			worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, err.Error()+"\n"+strings.Join(urls, "\n"))
+			worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, err.Error())
+			if err := worker.Telegram.SendPhoto(update.ChannelPost.Chat.ID, urls[0]); err != nil {
+				worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, strings.Join(urls, "\n"))
+				return err
+			}
 			return err
 		}
 	} else if len(urls) > 1 {
 		if err := worker.Telegram.SendDocuments(update.ChannelPost.Chat.ID, urls); err != nil {
-			worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, err.Error()+"\n"+strings.Join(urls, "\n"))
+			worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, err.Error())
+			if err := worker.Telegram.SendPhotos(update.ChannelPost.Chat.ID, urls); err != nil {
+				worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, strings.Join(urls, "\n"))
+				return err
+			}
 			return err
 		}
 	} else {
