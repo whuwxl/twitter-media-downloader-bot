@@ -22,11 +22,23 @@ func NewDownloanderWorker(telegram *service.Telegram, twitter *service.Twitter) 
 
 // FetchAndSend ...
 func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
-	if update.ChannelPost == nil {
+	if update.ChannelPost == nil && update.Message == nil {
 		return nil
 	}
 
-	url, err := url.Parse(update.ChannelPost.Text)
+	var text string
+	var chatID int64
+
+	if update.ChannelPost != nil {
+		text = update.ChannelPost.Text
+		chatID = update.ChannelPost.Chat.ID
+	}
+	if update.Message != nil {
+		text = update.Message.Text
+		chatID = update.Message.Chat.ID
+	}
+
+	url, err := url.Parse(text)
 	if err != nil {
 		return err
 	}
@@ -62,21 +74,13 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 	}
 
 	if len(urls) == 1 {
-		if err := worker.Telegram.SendDocument(update.ChannelPost.Chat.ID, urls[0]); err != nil {
-			worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, err.Error())
-			if err := worker.Telegram.SendPhoto(update.ChannelPost.Chat.ID, urls[0]); err != nil {
-				worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, strings.Join(urls, "\n"))
-				return err
-			}
+		if err := worker.Telegram.SendDocument(chatID, urls[0]); err != nil {
+			worker.Telegram.SendMessage(chatID, err.Error()+"\n"+strings.Join(urls, "\n"))
 			return err
 		}
 	} else if len(urls) > 1 {
-		if err := worker.Telegram.SendDocuments(update.ChannelPost.Chat.ID, urls); err != nil {
-			worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, err.Error())
-			if err := worker.Telegram.SendPhotos(update.ChannelPost.Chat.ID, urls); err != nil {
-				worker.Telegram.SendMessage(update.ChannelPost.Chat.ID, strings.Join(urls, "\n"))
-				return err
-			}
+		if err := worker.Telegram.SendDocuments(chatID, urls); err != nil {
+			worker.Telegram.SendMessage(chatID, err.Error()+"\n"+strings.Join(urls, "\n"))
 			return err
 		}
 	} else {
