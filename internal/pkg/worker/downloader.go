@@ -38,7 +38,7 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 	if update.Message != nil {
 		text = update.Message.Text
 		chatID = update.Message.Chat.ID
-		messageID = update.ChannelPost.MessageID
+		messageID = update.Message.MessageID
 	}
 
 	url, err := url.Parse(text)
