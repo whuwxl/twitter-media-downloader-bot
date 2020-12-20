@@ -28,14 +28,17 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 
 	var text string
 	var chatID int64
+	var messageID int
 
 	if update.ChannelPost != nil {
 		text = update.ChannelPost.Text
 		chatID = update.ChannelPost.Chat.ID
+		messageID = update.ChannelPost.MessageID
 	}
 	if update.Message != nil {
 		text = update.Message.Text
 		chatID = update.Message.Chat.ID
+		messageID = update.ChannelPost.MessageID
 	}
 
 	url, err := url.Parse(text)
@@ -87,7 +90,7 @@ func (worker *DownloanderWorker) FetchAndSend(update tgbotapi.Update) error {
 		return nil
 	}
 
-	worker.Telegram.DeleteMessage(update.ChannelPost.Chat.ID, update.ChannelPost.MessageID)
+	worker.Telegram.DeleteMessage(chatID, messageID)
 
 	return nil
 }
